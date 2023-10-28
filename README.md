@@ -168,10 +168,12 @@ print(outputs)
     - [x] 常规LoRA模块
     - [ ] 预训练&指令微调
     - [ ] 人类偏好反馈增强(RLHF、DPO、PRO等)
-- [x] 优化模块
+- [x] 长度外推
+    - [x] 原生支持4k
+    - [ ] 支持8k、16k等长度版本
+- [x] 性能优化模块
     - [x] 支持Flash-Attention-2
-
-1.性能强化，应用DPO，发布-chat版本
+    - [ ] 支持vLLM、Streaming-LLM等加速模块
 
 # FAQ
 
