@@ -1,10 +1,10 @@
 """
 Usage: 
 python merge_llama_with_chinese_lora_low_mem.py \
-    --base_model /mnt/data2/finLLM/models/chinese-alpaca-2-13b \
-    --lora_model /mnt/data2/finLLM/chinese-llama-alpaca-2-main/scripts/training/2023_09_17_2_copy/pt_lora_model \
+    --base_model /mnt/data2/finLLM/models/alpaca-2-13b \
+    --lora_model /mnt/data2/finLLM/llama-alpaca-2-main/pt_lora_model \
     --output_type huggingface \
-    --output_dir /mnt/data2/finLLM/test_wyl/all
+    --output_dir /mnt/data2/finLLM/test
 """
 import argparse
 import json
