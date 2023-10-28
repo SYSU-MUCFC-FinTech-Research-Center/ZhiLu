@@ -156,25 +156,26 @@ outputs = tokenizer.decode(outputs.cpu()[0][len(inputs.input_ids[0]):], skip_spe
 print(outputs)
 ```
 
-# To Do List
+# Roadmap
+
+- [x] 底座类型
+    - [x] 指令(Instruct)型
+    - [ ] 交互(Chat)型
+- [x] 数据增强
+    - [x] 通用场景知识
+    - [ ] 消金场景知识增强
+- [x] 训练模块
+    - [x] 常规LoRA模块
+    - [ ] 预训练&指令微调
+    - [ ] 人类偏好反馈增强(RLHF、DPO、PRO等)
+- [x] 优化模块
+    - [x] 支持Flash-Attention-2
 
 1.性能强化，应用DPO，发布-chat版本
 
-2.对标消费金融领域的实际场景进行性能增强
-
 # FAQ
 
-问题1：模型在预训练还是在指令微调阶段进行LoRA训练？
-
-本项目在预训练和指令微调阶段均使用LoRA进行高效训练。
-
-问题2：为什么对模型进行LoRA训练而非全量参数训练？
-
-考虑到训练成本和效率等因素，我们选择在Alpaca-2的基础上使用LoRA进行训练（embedding/lm_head全量参与训练）。
-
-问题3：为什么选择在Alpaca-2的基础上进行训练，而非Llama-2？
-
-Llama-2虽然已具备一定的中文理解能力，但在生成中文文本时仍然会夹杂英文，且中文词表大小有限，需要进行进一步的中文能力扩展，Alpaca-2在该方面已经做出了出色的工作。
+项目答疑以及部署中遇到问题的解决方案，请查阅[FAQ](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu/blob/main/FAQ.md)
 
 # 致谢
 
