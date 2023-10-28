@@ -3,7 +3,7 @@
 </p>
 
 # News
-[2023.10.28] 开源智鹿-13B对话大模型，是国内首个开源的千亿级中文对话大模型。🤗 [HuggingFace](https://huggingface.co/SYSU-MUCFC-FinTech-Research-Center/ZhiLu-13B-Instruct)
+[2023.10.28] 开源智鹿-13B对话大模型。🤗 [HuggingFace](https://huggingface.co/SYSU-MUCFC-FinTech-Research-Center/ZhiLu-13B-Instruct)
 
 # 目录
 
