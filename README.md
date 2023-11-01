@@ -68,8 +68,9 @@ gradient_accumulation_steps=1
 C-Eval榜单（截止至2023.10.29)
 <p align="center"> <img src="pics/ZhiLu_CEVAL_20231029.png" style="width: 50%;" id="title-icon">       </p>
 
-CMMLU榜单（截止至2023.10.29)
+CMMLU榜单（few-shot、zero-shot)（截止至2023.10.29)
 <p align="center"> <img src="pics/ZhiLu_CMMLU_20231029.png" style="width: 50%;" id="title-icon">       </p>
+<p align="center"> <img src="pics/ZhiLu_CMMLU_zs_20231029.png" style="width: 50%;" id="title-icon">       </p>
 
 ## 对话示例
 
