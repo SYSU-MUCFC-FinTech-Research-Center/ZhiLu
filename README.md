@@ -166,8 +166,8 @@ print(outputs)
 # Roadmap
 
 - [x] 底座类型
-    - [x] 指令(Instruct)型
-    - [ ] 交互(Chat)型
+    - [x] 交互(Chat)型
+    - [ ] 指令(Instruct)型
 - [x] 数据增强
     - [x] 通用场景知识
     - [ ] 消金场景知识增强
