@@ -7,13 +7,14 @@
 
 # 目录
 
-- [智鹿](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu#智鹿)
-  - [介绍]()   
-  - [训练细节]()
-  - [性能评测]()
-  - [对话示例]()
-  - [使用方式]()
-  - [Roadmap]()
+- [智鹿](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu#%E6%99%BA%E9%B9%BF)
+  - [介绍](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu#%E4%BB%8B%E7%BB%8D)   
+  - [训练细节](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu#%E8%AE%AD%E7%BB%83%E7%BB%86%E8%8A%82)
+  - [性能评测](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu#%E6%80%A7%E8%83%BD%E8%AF%84%E6%B5%8B)
+  - [对话示例](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu#%E5%AF%B9%E8%AF%9D%E7%A4%BA%E4%BE%8B)
+  - [使用方式](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F)
+  - [Roadmap](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu#Roadmap)
+  - [带PROMPT模板的对话](https://github.com/SYSU-MUCFC-FinTech-Research-Center/ZhiLu#%E5%B8%A6PROMPT%E6%A8%A1%E6%9D%BF%E7%9A%84%E5%AF%B9%E8%AF%9D)
 
 # 智鹿
 
@@ -162,6 +163,153 @@ outputs = model.generate(**inputs, max_new_tokens=64, repetition_penalty=1.1)
 outputs = tokenizer.decode(outputs.cpu()[0][len(inputs.input_ids[0]):], skip_special_tokens=True)
 print(outputs)
 ```
+
+## 带PROMPT模板的对话
+
+### 单轮对话
+
+```python
+import os
+import torch
+from transformers import (
+LlamaForCausalLM, 
+LlamaTokenizer,
+GenerationConfig
+)
+from peft import PeftModel
+model_name_or_path = ""
+peft_model_path = ""
+tokenizer = LlamaTokenizer.from_pretrained(model_name_or_path, use_fast=False, legacy=True)
+model = LlamaForCausalLM.from_pretrained(model_name_or_path, torch_dtype=torch.bfloat16,device_map="auto")
+if peft_model_path is not None:
+    model = PeftModel.from_pretrained(
+            model,
+            peft_model_path,
+            torch_dtype=(
+            torch.bfloat16
+            if torch.cuda.is_bf16_supported()
+            else torch.float32
+        ),
+    )
+print(model)
+generation_config = GenerationConfig.from_pretrained(model_name_or_path)
+config_updates = {
+    'do_sample': True,
+    'num_beams': 1,
+    'repetition_penalty': 1.1,
+    'min_new_tokens': 20,
+    'top_k' : 50,
+    'top_p' : 0.95, 
+    'temperature' : 0.7
+}
+# 更新生成配置
+for key, value in config_updates.items():
+    setattr(generation_config, key, value)
+prompt_template = (
+    "[INST] <<SYS>>\n"
+    "You are a helpful assistant. 你是一个乐于助人的助手。\n"
+    "<</SYS>>\n\n"
+    "{instruction} [/INST]"
+)
+instruction = "什么是A股？"
+prompt = prompt_template.format_map({'instruction':instruction})
+input_ids = tokenizer.encode(prompt, return_tensors="pt").cuda()
+output = model.generate(inputs = input_ids,generation_config = generation_config, return_dict_in_generate=True, num_return_sequences=1)  
+output_text = tokenizer.decode(output.sequences[0], skip_special_tokens=True)
+print(output_text)
+
+'''
+[INST] <<SYS>>
+You are a helpful assistant. 你是一个乐于助人的助手。
+<</SYS>>
+
+什么是A股？ [/INST] A股指的是中国内地的股票市场，也被称为上海证券交易所和深圳证券交易所的主板股票市场。它是中国证券市场的主要部分，包括了许多大型上市公司。与此同时，A股市场也包括了中小型企业和创业公司的股票交易。A股市场的特点是具有较高的波动性，投资者可以通过购买股票来参与市场的买卖活动，并从中获得资本收益或分红收益。在A股市场上，股价会受到多种因素的影响，例如公司业绩、宏观经济状况以及政府政策等。因此，了解A股市场的基本概念和运作方式对于投资决策非常重要。
+'''
+```
+
+### 多轮对话
+
+```python
+import os
+import torch
+from transformers import (
+LlamaForCausalLM, 
+LlamaTokenizer,
+GenerationConfig
+)
+from peft import PeftModel
+model_name_or_path = ""
+peft_model_path = ""
+tokenizer = LlamaTokenizer.from_pretrained(model_name_or_path, use_fast=False, legacy=True)
+model = LlamaForCausalLM.from_pretrained(model_name_or_path, torch_dtype=torch.bfloat16,device_map="auto")
+if peft_model_path is not None:
+    model = PeftModel.from_pretrained(
+            model,
+            peft_model_path,
+            torch_dtype=(
+            torch.bfloat16
+            if torch.cuda.is_bf16_supported()
+            else torch.float32
+        ),
+    )
+print(model)
+generation_config = GenerationConfig.from_pretrained(model_name_or_path)
+config_updates = {
+    'do_sample': True,
+    'num_beams': 1,
+    'repetition_penalty': 1.1,
+    'min_new_tokens': 20,
+    'top_k' : 50,
+    'top_p' : 0.95, 
+    'temperature' : 0.7
+}
+# 更新生成配置
+for key, value in config_updates.items():
+    setattr(generation_config, key, value)
+def multi_generate(history, insturction):
+    history_str = "".join(history)
+    prompt = history_str + insturction
+    input_ids = tokenizer.encode(prompt, return_tensors="pt").cuda()
+    output = model.generate(inputs = input_ids,generation_config = generation_config, return_dict_in_generate=True, num_return_sequences=1)  
+    output_text = tokenizer.decode(output.sequences[0], skip_special_tokens=True)
+    history.append(output_text.replace(history_str, ""))
+    answer = output_text.replace(history_str, "")
+    answer = answer.replace(insturction, "")
+    # answer 已去掉上下文及用户输入的文本
+    return answer
+history = []
+cnt = 1
+prompt_template = (
+    "[INST] <<SYS>>\n"
+    "You are a helpful assistant. 你是一个乐于助人的助手。\n"
+    "<</SYS>>\n\n"
+    "{instruction} [/INST]"
+)
+print(f"-------------round {cnt} --------------")
+cnt += 1
+user_input = input("user:")
+user_input = prompt_template.format_map({'instruction':user_input})
+answer = multi_generate(history, user_input)
+print(f"ZhiLu:{answer}")
+while True:
+    print(f"-------------round {cnt} --------------")
+    cnt += 1    
+    user_input = input("user:")
+    user_input = f"[INST] {user_input} [/INST]"
+    answer = multi_generate(history, user_input)
+    print(f"ZhiLu:{answer}")
+
+'''
+-------------round 1 --------------
+user:什么是A股？
+ZhiLu:A股市场是中国股票市场的一个重要组成部分，指代在上海证券交易所和深圳证券交易所上市的股票。它是中国内地投资者进行股票交易的主要场所。A股市场的特点如下：- A股市场是中国内地股票市场的主体，也是全球最大的股票市场之一。- A股市场的股票只能在中国境内交易，且只有中国公民和机构可以参与该市场。- A股市场的交易时间一般为周一至周五上午9:30至下午3:00，中午有一个短暂的休市时间。- A股市场实行T+1制度，即当日买入的股票次日才能卖出，有助于减少短期投机行为。- A股市场的股票价格通常会受到多种因素的影响，包括经济状况、政策变化、行业动态和公司业绩等。总而言之，A股市场是中国内地股票市场，提供了广泛的投资机会和灵活的交易机制，但也存在相应的风险需要投资者谨慎对待。
+-------------round 2 --------------
+user:在哪可以看A股？
+ZhiLu:可以通过以下几种方式查看A股市场的数据和行情：1. 股票交易软件：许多券商都提供自家的手机应用或网页版交易软件，你可以在这些平台上查询股票的价格、成交量、涨跌幅等相关指标。2. 财经网站：像新浪财经、东方财富网等财经网站都可以提供实时的股票行情、新闻资讯和研究报告等信息。3. 电视台财经频道：观看财经类电视台如CCTV证券、上海证券报等，他们会定期报道股市动态、新闻报道和专家观点等。无论使用哪种方法，记得始终注意信息来源的可靠性和准确性，同时也要注意市场风险和自身投资能力。
+'''
+```
+
+
 
 # Roadmap
 
